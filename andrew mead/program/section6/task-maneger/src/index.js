@@ -15,8 +15,8 @@ app.post("/users", (req, res) => {
   const user = new Users(req.body);
   user
     .save()
-    .then((result) => {
-      res.status(201).send(result);
+    .then(() => {
+      res.status(201).send(user);
     })
     .catch((error) => {
       res.status(400).send(error);
