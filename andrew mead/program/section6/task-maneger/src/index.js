@@ -41,7 +41,7 @@ app.get("/users", async (req, res) => {
   }
 });
 
-app.get("/user/:id",async (req, res) => {
+app.get("/user/:id", async (req, res) => {
   const _id = req.params.id;
   try {
     const findById = await Users.findById(_id);
@@ -51,5 +51,40 @@ app.get("/user/:id",async (req, res) => {
     res.send(findById);
   } catch (e) {
     res.status(500).send("Server Error");
+  }
+});
+
+app.patch("/user/:id", async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ["name", "email", "password", "age"];
+  const isValidOperation = updates.every((update) =>
+    allowedUpdates.includes(update)
+  );
+  if (!isValidOperation) {
+    return res.status(400).send({ error: "Invalid operation!" });
+  }
+  try {
+    const updateUser = await Users.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!updateUser) {
+      return res.status(404).send({ message: "User not found" });
+    }
+    res.status(200).send(updateUser);
+  } catch (e) {
+    res.status(500).send(e);
+  }
+});
+
+app.delete("/user/:id", async (req, res) => {
+  try {
+    const removeContact = await Users.findByIdAndDelete(req.params.id );
+    if (!removeContact) {
+      return res.status(404).send({ message: "User not found" });
+    }
+    res.status(200).send(removeContact);
+  } catch (e) {
+    res.status(500).send(e);
   }
 });
