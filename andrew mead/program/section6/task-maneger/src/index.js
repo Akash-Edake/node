@@ -11,49 +11,45 @@ app.listen(port, () => {
   console.log(`Server is running on ${port}`);
 });
 
-app.post("/users", (req, res) => {
+app.post("/users", async (req, res) => {
   const user = new Users(req.body);
-  user
-    .save()
-    .then(() => {
-      res.status(201).send(user);
-    })
-    .catch((error) => {
-      res.status(400).send(error);
-    });
+
+  try {
+    await user.save();
+    res.status(201).send(user);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
-app.post("/contactInfo", (req, res) => {
+app.post("/contactInfo", async (req, res) => {
   const contact = new contactInfo(req.body);
-  contact
-    .save()
-    .then((result) => {
-      res.status(201).send(result);
-    })
-    .catch((error) => {
-      res.status(400).send(error);
-    });
+
+  try {
+    await contact.save();
+    res.status(201).send(contact);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
-app.get("/users", (req, res) => {
-  Users.find({})
-    .then((user) => {
-      res.send(user);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
+app.get("/users", async (req, res) => {
+  try {
+    const usersFind = await Users.find({});
+    res.status(200).send(usersFind);
+  } catch (e) {
+    res.status(500).send("Error");
+  }
 });
 
-app.get("/user/:id", (req, res) => {
+app.get("/user/:id",async (req, res) => {
   const _id = req.params.id;
-  Users.findById(_id)
-    .then((user) => {
-      if (!user) {
-        return res.status(404).send({ message: "User not found" });
-      }
-      res.send(user);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
+  try {
+    const findById = await Users.findById(_id);
+    if (!findById) {
+      return res.status(404).send({ message: "User not found" });
+    }
+    res.send(findById);
+  } catch (e) {
+    res.status(500).send("Server Error");
+  }
 });
