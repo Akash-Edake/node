@@ -45,10 +45,13 @@ router.patch("/user/:id", async (req, res) => {
     return res.status(400).send({ error: "Invalid operation!" });
   }
   try {
-    const updateUser = await Users.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const updateUser = await Users.findById(req.params.id)
+    updates.forEach(element => updateUser[element]=req.body[element]);
+    await updateUser.save()
+    // const updateUser = await Users.findByIdAndUpdate(req.params.id, req.body, {
+    //   new: true,
+    //   runValidators: true,
+    // });
     if (!updateUser) {
       return res.status(404).send({ message: "User not found" });
     }

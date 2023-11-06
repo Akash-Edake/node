@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-
-let schema = {
+const bcrypt = require("bcrypt");
+let schema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Name is required"],
@@ -20,7 +20,16 @@ let schema = {
     minlength: 10,
     maxlength: 12,
   },
-};
+});
 
+schema.pre("save", async function (next) {
+  const user = this;
+
+  if (user.isModified("name")) {
+    user.name = await bcrypt.hash(user.name, 8);
+  }
+  console.log("just before saving!");
+  next();
+});
 const contactInfo = mongoose.model("contactInfo", schema);
 module.exports = contactInfo;

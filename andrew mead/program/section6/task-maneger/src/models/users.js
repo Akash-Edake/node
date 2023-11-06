@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcrypt");
 
-const schema = {
+const schema = new mongoose.Schema({
   name: { type: String },
   email: {
     type: String,
@@ -30,16 +31,24 @@ const schema = {
     validate(value) {
       if (value.toLowerCase() === "password") {
         throw new Error("Password is not correct && Age>18");
-      }else if(this.age < 18 ){
+      } else if (this.age < 18) {
         throw new Error("Age!>18");
       }
     },
   },
-};
+});
+schema.pre("save", async function (next) {
+  const user = this;
 
+  if (user.isModified("password")) {
+    user.password = await bcrypt.hash(user.password, 8);
+  }
+  console.log("just before saving!");
+  next();
+});
 const User = mongoose.model(
   "User", //! collection name is users  !user
   schema
 );
 
-module.exports = User
+module.exports = User;
