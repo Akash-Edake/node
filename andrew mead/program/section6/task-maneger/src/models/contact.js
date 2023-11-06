@@ -16,6 +16,7 @@ let schema = new mongoose.Schema({
   },
   number: {
     type: Number,
+    unique : true,
     required: [true, "number is required"],
     minlength: 10,
     maxlength: 12,

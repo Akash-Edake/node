@@ -34,7 +34,15 @@ router.post("/users", async (req, res) => {
     res.status(400).send(e);
   }
 });
-
+router.post("/users/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await Users.findByCredentials(email, password); //custome create findByCredentials
+    res.send(user);
+  } catch (e) {
+    res.status(400).send();
+  }
+});
 router.patch("/user/:id", async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ["name", "email", "password", "age"];
@@ -45,9 +53,9 @@ router.patch("/user/:id", async (req, res) => {
     return res.status(400).send({ error: "Invalid operation!" });
   }
   try {
-    const updateUser = await Users.findById(req.params.id)
-    updates.forEach(element => updateUser[element]=req.body[element]);
-    await updateUser.save()
+    const updateUser = await Users.findById(req.params.id);
+    updates.forEach((element) => (updateUser[element] = req.body[element]));
+    await updateUser.save();
     // const updateUser = await Users.findByIdAndUpdate(req.params.id, req.body, {
     //   new: true,
     //   runValidators: true,

@@ -6,6 +6,7 @@ const schema = new mongoose.Schema({
   name: { type: String },
   email: {
     type: String,
+    unique: true,
     required: true,
     trim: true,
     lowercase: true,
@@ -37,6 +38,21 @@ const schema = new mongoose.Schema({
     },
   },
 });
+
+
+//! findByCredentials custome created
+schema.statics.findByCredentials = async (email, password) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error("Unable to login");
+  }
+  let isValidated = await bcrypt.compare(password, user.password);
+  if (!isValidated) {
+    throw new Error("Incorrect Password");
+  }
+  return user;
+};
+
 schema.pre("save", async function (next) {
   const user = this;
 
